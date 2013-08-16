@@ -1,6 +1,6 @@
-# Gitfyncy
+# git-fyncy
 
-TODO: Write a gem description
+The funky git aware remote syncer.
 
 ## Installation
 
@@ -18,7 +18,9 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Sync the current working directory to the given path on the given remote:
+
+    $ git fyncy <remote> <path>
 
 ## Contributing
 
