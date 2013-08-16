@@ -8,9 +8,10 @@ Gem::Specification.new do |gem|
   gem.version       = Gitfyncy::VERSION
   gem.authors       = ["Ryan McGowan"]
   gem.email         = ["ryan@ryanmcg.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+  gem.description   = %q{The funky git aware syncer.}
+  gem.summary       = %q{Want to sync the working directories of your git
+                         directory with a remote one. Look no futher.}
+  gem.homepage      = "https://github.com/RyanMcG/git-fyncy"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
