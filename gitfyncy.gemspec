@@ -16,4 +16,8 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
+
+  [['listen', '~> 1.3']].each do |dep|
+    gem.add_dependency(*dep)
+  end
 end
