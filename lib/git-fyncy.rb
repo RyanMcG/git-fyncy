@@ -2,8 +2,6 @@ require "git-fyncy/version"
 require 'listen'
 
 module GitFyncy
-  PREFIX = 'git-fyncy'
-
   def self.slashify(path)
     path[-1] == '/' ? path : path + '/'
   end
@@ -17,7 +15,7 @@ module GitFyncy
     end
 
     def command(cmd)
-      puts "#{Gitfyncy::PREFIX}: #{cmd}"
+      puts cmd
       system cmd
     end
 
@@ -53,21 +51,16 @@ module GitFyncy
   def self.main(remote, path)
     pexit 'A remote and path must be specified' unless remote && path
     remote = Remote.new remote, path
-    controlled_paths = Set.new git_aware_files
-    remote.scp controlled_paths
+    remote.scp git_aware_files
     relpath = method :relative_path
+
+    files_to_remove = Set.new
     Listen.to!('.') do |modified, added, removed|
       begin
-        changed_paths = (modified + added).map(&relpath).
-          select(&method(:git_aware_of_path?))
-        remote.scp changed_paths
-
-        controlled_removed = controlled_paths.intersection removed.map(&relpath)
-        controlled_paths.merge changed_paths
-
-        if remote.ssh_rm controlled_removed
-          controlled_paths.subtract controlled_removed
-        end
+        remote.scp git_aware_files
+        rel_removed = removed.map(&relpath)
+        files_to_remove.merge rel_removed
+        files_to_remove.clear if remote.ssh_rm files_to_remove
       rescue => e
         puts e.inspect
       end
