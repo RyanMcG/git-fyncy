@@ -6,7 +6,7 @@ The funky git aware remote syncer.
 
 Add this line to your application's Gemfile:
 
-    gem 'gitfyncy'
+    gem 'git-fyncy'
 
 And then execute:
 
@@ -14,7 +14,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install gitfyncy
+    $ gem install git-fyncy
 
 ## Usage
 

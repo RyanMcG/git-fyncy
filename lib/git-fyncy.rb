@@ -1,7 +1,7 @@
-require "gitfyncy/version"
+require "git-fyncy/version"
 require 'listen'
 
-module Gitfyncy
+module GitFyncy
   PREFIX = 'git-fyncy'
 
   def self.slashify(path)
@@ -13,7 +13,7 @@ module Gitfyncy
   class Remote
     def initialize(remote, path)
       @remote = remote
-      @path = Gitfyncy.slashify path
+      @path = GitFyncy.slashify path
     end
 
     def command(cmd)

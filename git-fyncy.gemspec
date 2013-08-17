@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'gitfyncy/version'
+require 'git-fyncy/version'
 
 Gem::Specification.new do |gem|
-  gem.name          = "gitfyncy"
-  gem.version       = Gitfyncy::VERSION
+  gem.name          = "git-fyncy"
+  gem.version       = GitFyncy::VERSION
   gem.authors       = ["Ryan McGowan"]
   gem.email         = ["ryan@ryanmcg.com"]
   gem.description   = %q{The funky git aware syncer.}
