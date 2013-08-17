@@ -12,6 +12,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{Want to sync the working directories of your git
                          directory with a remote one. Look no futher.}
   gem.homepage      = "https://github.com/RyanMcG/git-fyncy"
+  gem.license       = 'MIT'
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
