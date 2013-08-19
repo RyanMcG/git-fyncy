@@ -57,15 +57,19 @@ module GitFyncy
     relpath = method :relative_path
 
     files_to_remove = Set.new
-    Listen.to!('.') do |modified, added, removed|
-      begin
-        remote.scp git_aware_files
-        rel_removed = removed.map(&relpath)
-        files_to_remove.merge rel_removed
-        files_to_remove.clear if remote.ssh_rm files_to_remove
-      rescue => e
-        puts e.inspect
+    begin
+      Listen.to!('.') do |modified, added, removed|
+        begin
+          remote.scp git_aware_files
+          rel_removed = removed.map(&relpath)
+          files_to_remove.merge rel_removed
+          files_to_remove.clear if remote.ssh_rm files_to_remove
+        rescue => e
+          puts e.inspect
+        end
       end
+    rescue SignalException
+      exit 42
     end
   end
 end
