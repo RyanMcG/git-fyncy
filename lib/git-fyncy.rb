@@ -15,7 +15,7 @@ module GitFyncy
     end
 
     def command(cmd)
-      puts cmd
+      puts cmd.length < 80 ? cmd : cmd[0...77] + '...'
       system cmd
     end
 
