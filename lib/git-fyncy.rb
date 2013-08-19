@@ -48,7 +48,9 @@ module GitFyncy
     exit 1
   end
 
-  def self.main(remote, path)
+  def self.main(remote, path, working_dir=nil)
+    working_dir ||= Dir.pwd
+    Dir.chdir working_dir
     pexit 'A remote and path must be specified' unless remote && path
     remote = Remote.new remote, path
     remote.scp git_aware_files
