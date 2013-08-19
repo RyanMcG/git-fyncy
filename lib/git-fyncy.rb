@@ -34,11 +34,7 @@ module GitFyncy
   end
 
   def self.git_aware_files
-    `git ls-files`.split("\n")
-  end
-
-  def self.git_aware_of_path?(path)
-    self.git_aware_files.include? path
+    `git ls-files -cmo --exclude-standard`.split("\n")
   end
 
   def self.pexit(error)
