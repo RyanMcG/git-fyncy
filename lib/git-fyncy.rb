@@ -6,8 +6,6 @@ module GitFyncy
     path[-1] == '/' ? path : path + '/'
   end
 
-  RELATIVE_PATH = slashify `pwd`.rstrip
-
   class Remote
     def initialize(remote, path)
       @remote = remote
@@ -31,7 +29,7 @@ module GitFyncy
   end
 
   def self.relative_path(path)
-    path.slice! RELATIVE_PATH
+    path.slice! GitFyncy.slashify(Dir.pwd)
     path
   end
 
