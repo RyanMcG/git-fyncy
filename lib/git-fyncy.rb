@@ -50,9 +50,16 @@ module GitFyncy
     remote.scp git_aware_files
     relpath = method :relative_path
 
+    puts "GIT FYNCY #{DateTime.now.ctime}"
     files_to_remove = Set.new
     begin
+      pid = nil
       Listen.to!('.') do |modified, added, removed|
+        if pid != Process.id
+          pid = Process.id
+          puts "pid: #{pid}"
+        end
+
         begin
           remote.scp git_aware_files
           rel_removed = removed.map(&relpath)
@@ -64,6 +71,8 @@ module GitFyncy
       end
     rescue SignalException
       exit 42
+    ensure
+      puts "\n"
     end
   end
 end
