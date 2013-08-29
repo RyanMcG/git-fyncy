@@ -50,7 +50,7 @@ module GitFyncy
     remote.scp git_aware_files
     relpath = method :relative_path
 
-    puts "GIT FYNCY #{DateTime.now.ctime}"
+    puts "GIT FYNCY #{Time.now.ctime}"
     files_to_remove = Set.new
     begin
       pid = nil
