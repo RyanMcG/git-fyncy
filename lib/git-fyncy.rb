@@ -53,13 +53,7 @@ module GitFyncy
     puts "GIT FYNCY #{Time.now.ctime}"
     files_to_remove = Set.new
     begin
-      pid = nil
       Listen.to!('.') do |modified, added, removed|
-        if pid != Process.id
-          pid = Process.id
-          puts "pid: #{pid}"
-        end
-
         begin
           remote.scp git_aware_files
           rel_removed = removed.map(&relpath)
