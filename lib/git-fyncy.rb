@@ -19,7 +19,7 @@ module GitFyncy
 
     def scp(paths)
       return if paths.empty?
-      command "rsync -zR #{paths.to_a.join ' '} #{@remote}:#{@path}"
+      command "rsync -zpR #{paths.to_a.join ' '} #{@remote}:#{@path}"
     end
 
     def ssh_rm(paths)
