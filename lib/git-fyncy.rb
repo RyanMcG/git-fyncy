@@ -17,9 +17,10 @@ module GitFyncy
       system cmd
     end
 
-    def scp(paths)
+    def scp(paths, rsync_args=[])
       return if paths.empty?
-      command "rsync -zpR #{paths.to_a.join ' '} #{@remote}:#{@path}"
+      rsync_flags = rsync_args.join(" ")
+      command "rsync -zpR #{rsync_flags} #{paths.to_a.join ' '} #{@remote}:#{@path}"
     end
 
     def ssh_rm(paths)
@@ -42,12 +43,12 @@ module GitFyncy
     exit 1
   end
 
-  def self.main(remote, path, working_dir=nil)
+  def self.main(remote, path, *rsync_args)
     working_dir ||= Dir.pwd
     Dir.chdir working_dir
     pexit 'A remote and path must be specified' unless remote && path
     remote = Remote.new remote, path
-    remote.scp git_aware_files
+    remote.scp git_aware_files, rsync_args
     relpath = method :relative_path
 
     puts "GIT FYNCY #{Time.now.ctime}"
@@ -55,7 +56,7 @@ module GitFyncy
     begin
       Listen.to!('.') do |modified, added, removed|
         begin
-          remote.scp git_aware_files
+          remote.scp git_aware_files, rsync_args
           rel_removed = removed.map(&relpath)
           files_to_remove.merge rel_removed
           files_to_remove.clear if remote.ssh_rm files_to_remove
