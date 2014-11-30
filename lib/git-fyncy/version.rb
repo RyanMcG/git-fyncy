@@ -1,3 +1,3 @@
 module GitFyncy
-  VERSION = "0.5.0-SNAPSHOT"
+  VERSION = "0.5.0"
 end
