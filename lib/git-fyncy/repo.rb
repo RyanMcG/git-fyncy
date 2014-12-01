@@ -28,7 +28,7 @@ module GitFyncy
       system "git config --get remote.#{remote_name}.url"
     end
 
-    TRAILING_GIT_REGEX = %r{^(.*)(s\.git/?$)}.freeze
+    TRAILING_GIT_REGEX = %r{^(.*)(\.git/?$)}.freeze
     def self.remove_trailing_git(str)
       md = TRAILING_GIT_REGEX.match str
       md ? md[1] : str
