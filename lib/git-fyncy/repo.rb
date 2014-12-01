@@ -3,22 +3,29 @@ require 'git-fyncy/utils'
 module GitFyncy
   module Repo
     extend Utils
-    GIT_CONFIG_NAME = "fyncy.remote"
+    GIT_CONFIG = {
+      remote_name: "fyncy.remote".freeze,
+      url: "fyncy.url".freeze
+    }.freeze
     DEFAULT_REMOTE = "origin".freeze
-
 
     def self.get_stdout_str(cmd)
       out = `#{cmd}`.chomp
       out.empty? ? nil : out
     end
 
-    def self.fyncy_remote_name_from_config
-      get_stdout_str "git config --get #{GIT_CONFIG_NAME}"
-    end
+    module ClassMethods
+      [:remote_name, :url].each do |name|
+        define_method("#{name}_from_config") do
+          get_stdout_str "git config --get #{GIT_CONFIG.fetch(name)}"
+        end
 
-    def self.configure_fyncy_remote(remote_name)
-      system "git config --add #{GIT_CONFIG_NAME} '#{remote_name}'"
+        define_method("configure_fyncy_#{name}") do |val|
+          system "git config --add #{GIT_CONFIG.fetch(name)} '#{val}'"
+        end
+      end
     end
+    extend ClassMethods
 
     def self.lookup_remote_url(remote_name)
       get_stdout_str "git config --get remote.#{remote_name}.url"
@@ -37,10 +44,7 @@ module GitFyncy
     SSH_URL_REGEX = %r{ssh://(\w+@)?([\w\.]+)(:\d+)?([/\w\.]*)$}.freeze
     SCP_REGEX = /^(\w+@)?([\.\w]+):(.*)$/.freeze
 
-    def self.host_and_path_for_remote(remote_name)
-      url = lookup_remote_url remote_name
-      return unless url
-
+    def self.host_and_path_from_url(url)
       md = SSH_URL_REGEX.match url
       if md
         user = md[1]
@@ -63,26 +67,44 @@ module GitFyncy
       ["#{user}#{host}", path]
     end
 
+    def self.host_and_path_for_remote(remote_name)
+      url = lookup_remote_url remote_name
+      return unless url
+      host_and_path_from_url url
+    end
+
     def self.prompt_user_for_remote_name
-      print "No remote specified for git fyncy. Enter the name of the remote to use (or press return to use the default, #{DEFAULT_REMOTE}):"
+      prompt = <<-EOS
+No remote configured. git fyncy looks under the fyncy section of your git
+config for a remote name or a url (i.e. at fyncy.remote and fyncy.url). If a
+remote name is specified, that remote's url be used with any ".git" suffix
+removed.
+
+Enter a remote name to use (or press return to use #{DEFAULT_REMOTE}): 
+EOS
+      print prompt.chomp
+
       remote_name = gets.chomp
       remote_name = DEFAULT_REMOTE if remote_name.empty?
       if remote_defined?(remote_name)
         puts
       else
-        pexit "A remote by the name of #{remote_name} is not defined in this repo."
+        pexit "A remote by the name of \"#{remote_name}\" is not defined in this repo."
       end
 
-      if configure_fyncy_remote remote_name
+      if configure_fyncy_remote_name remote_name
         remote_name
       else
-        pexit "Failed to set #{GIT_CONFIG_NAME} to #{remote_name}. Perhaps there was a permissions error?"
+        pexit "Failed to set #{GIT_CONFIG.fetch(:remote_name)} to #{remote_name}."
       end
     end
 
     def self.host_and_path_from_current_repo
       # Determine remote fyncy should use
-      remote_name = fyncy_remote_name_from_config
+      url = url_from_config
+      return host_and_path_from_url url if url
+
+      remote_name = remote_name_from_config
       remote_name = prompt_user_for_remote_name unless remote_name
       res = nil
       res = host_and_path_for_remote remote_name if remote_name
