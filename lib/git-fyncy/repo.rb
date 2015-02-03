@@ -41,8 +41,8 @@ module GitFyncy
       md ? md[1] : str
     end
 
-    SSH_URL_REGEX = %r{ssh://(\w+@)?([\w\.]+)(:\d+)?([/\w\.]*)$}.freeze
-    SCP_REGEX = /^(\w+@)?([\.\w]+):(.*)$/.freeze
+    SSH_URL_REGEX = %r{ssh://(\w+@)?([-_\w\.]+)(:\d+)?([/\w\.]*)$}.freeze
+    SCP_REGEX = /^(\w+@)?([-_\.\w]+):(.*)$/.freeze
 
     def self.host_and_path_from_url(url)
       md = SSH_URL_REGEX.match url
