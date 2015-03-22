@@ -15,13 +15,13 @@ module GitFyncy
     end
 
     module ClassMethods
-      [:remote_name, :url].each do |name|
+      GIT_CONFIG.each do |name, key|
         define_method("#{name}_from_config") do
-          get_stdout_str "git config --get #{GIT_CONFIG.fetch(name)}"
+          get_stdout_str "git config --get #{key}"
         end
 
         define_method("configure_fyncy_#{name}") do |val|
-          system "git config --add #{GIT_CONFIG.fetch(name)} '#{val}'"
+          system "git config --add #{key} '#{val}'"
         end
       end
     end
@@ -46,6 +46,11 @@ module GitFyncy
 
     def self.host_and_path_from_url(url)
       md = SSH_URL_REGEX.match url
+      user = nil
+      host = nil
+      remote = nil
+      path = url
+
       if md
         user = md[1]
         host = md[2]
@@ -56,15 +61,15 @@ module GitFyncy
         path = md[4]
       else
         md = SCP_REGEX.match url
-        unless md
-          pexit "Could not determine host and path from url (#{url}). To work with git-fyncy, the remote's url should be an ssh (i.e. start with \"ssh://\") or scp (i.e. USER@HOST:PATH) style url."
+        if md
+          user = md[1]
+          host = md[2]
+          path = slashify remove_trailing_git md[3]
         end
-        user = md[1]
-        host = md[2]
-        path = slashify remove_trailing_git md[3]
       end
 
-      ["#{user}#{host}", path]
+      remote = "#{user}#{host}" if user && host
+      [remote, path]
     end
 
     def self.host_and_path_for_remote(remote_name)
@@ -77,14 +82,14 @@ module GitFyncy
       prompt = <<-EOS
 No remote configured. git fyncy looks under the fyncy section of your git
 config for a remote name or a url (i.e. at fyncy.remote and fyncy.url). If a
-remote name is specified, that remote's url be used with any ".git" suffix
-removed.
+remote name is specified, that remote's url will be used with the ".git" suffix
+removed if it exists.
 
 Enter a remote name to use (or press return to use #{DEFAULT_REMOTE}): 
 EOS
       print prompt.chomp
 
-      remote_name = gets.chomp
+      remote_name = STDIN.gets.chomp
       remote_name = DEFAULT_REMOTE if remote_name.empty?
       if remote_defined?(remote_name)
         puts
@@ -105,7 +110,7 @@ EOS
       return host_and_path_from_url url if url
 
       remote_name = remote_name_from_config
-      remote_name = prompt_user_for_remote_name unless remote_name
+      remote_name = prompt_user_for_remote_name if STDIN.tty? && !remote_name
       res = nil
       res = host_and_path_for_remote remote_name if remote_name
       res = host_and_path_for_remote DEFAULT_REMOTE unless res

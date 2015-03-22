@@ -1,4 +1,4 @@
 #!/usr/bin/env ruby
 require 'git-fyncy'
 
-GitFyncy::main(*ARGV)
+GitFyncy.main(ARGV)

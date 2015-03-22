@@ -4,25 +4,32 @@ module GitFyncy
   class Remote
     include Utils
 
-    def initialize(remote, path, rsync_args)
+    def initialize(logger, remote, path, rsync_args)
+      @logger = logger
       @remote = remote
       @path = slashify path
       @rsync_flags = rsync_args.join(" ")
+
+      # COMMANDS
+      @rm_cmd = "cd #{@path}; rm -f %{paths}"
+      @rm_cmd = "ssh #{@remote} '#{@rm_cmd}'" if @remote
+      path = @remote ? "#{@remote}:#{@path}" : @path
+      @rsync_cmd = "rsync -zpR --checksum #{@rsync_flags} %{paths} #{path}"
     end
 
-    def command(cmd)
-      puts cmd.length < 80 ? cmd : cmd[0...77] + '...'
+    def command(cmd, paths)
+      return if paths.empty?
+      cmd = cmd % {paths: paths.to_a.join(' ')}
+      @logger.log cmd
       system cmd
     end
 
-    def scp(paths, rsync_args=[])
-      return if paths.empty?
-      command "rsync -zpR --checksum #{@rsync_flags} #{paths.to_a.join ' '} #{@remote}:#{@path}"
+    def rsync(paths)
+      command @rsync_cmd, paths
     end
 
-    def ssh_rm(paths)
-      return if paths.empty?
-      command "ssh #{@remote} 'cd #{@path}; rm -f #{paths.to_a.join ' '}'"
+    def rm(paths)
+      command @rm_cmd, paths
     end
   end
 end
