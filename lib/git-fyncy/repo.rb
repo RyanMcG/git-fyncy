@@ -68,7 +68,7 @@ module GitFyncy
         end
       end
 
-      remote = "#{user}#{host}" if user && host
+      remote = "#{user}#{host}" if host
       [remote, path]
     end
 
