@@ -50,7 +50,6 @@ module GitFyncy
     def daemonize
       pid = fork
       if pid # parent
-        File.write ".git-fyncy-pid", pid
         Process.detach pid
         exit 0
       end

@@ -6,17 +6,26 @@ module GitFyncy
   extend Utils
   PID_FNAME = ".git-fyncy-pid".freeze
 
+  def self.old_pid
+    @_old_pid ||= File.read(PID_FNAME).to_i
+  end
+
   def self.already_running?
-    File.exists? PID_FNAME
+    return false unless File.exists? PID_FNAME
+    begin
+      Process.kill 0, old_pid
+      true
+    rescue Errno::ESRCH
+      false
+    end
   end
 
   def self.kill
     if already_running?
-      pid = File.read(PID_FNAME).to_i
-      if Process.kill "TERM", pid
+      if Process.kill "TERM", old_pid
         File.delete PID_FNAME
       else
-        pexit "Failed to kill process with id #{pid}"
+        pexit "Failed to kill process with id #{old_pid}"
       end
     else
       pexit "No process to kill. No #{PID_FNAME} file."
@@ -44,6 +53,11 @@ module GitFyncy
       pexit "\nGIT FYNCY: First remote command failed, exiting"
     end
 
+    File.write PID_FNAME, Process.pid
+    trap("INT") do
+      File.delete PID_FNAME
+      pexit "Exiting happily!"
+    end
     synchronizer.listen
   end
 end
