@@ -20,7 +20,7 @@ Or install it yourself as:
 
 Sync the current working directory to the given path on the given remote:
 
-    $ git fyncy <remote> <path>
+    $ git fyncy [--kill | --fork] [RSYNC_ARGS...]
 
 ## Contributing
 
