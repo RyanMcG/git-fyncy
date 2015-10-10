@@ -4,7 +4,7 @@ require 'listen'
 
 module GitFyncy
   extend Utils
-  PID_FNAME = ".git-fyncy-pid".freeze
+  PID_FNAME = ".git/fyncy-pid".freeze
 
   def self.old_pid
     @_old_pid ||= File.read(PID_FNAME).to_i
